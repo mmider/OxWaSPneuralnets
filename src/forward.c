@@ -5,32 +5,43 @@
 
 void forward(par_c* q, par* p) {
   /*
-    Takes a single x and performs a single forward sweep for a given
-    state of neural network. Stores the z=Wx+b for each layer in the
-    z "history array" and stores sigmoid(Wx+b) (or possibly softmax(Wx+b)
-    if softmax == true for the last layer) for each layer in the transf_x
+    Forward sweep for x in q. Scores: z=Wx+b and transformed
+    inputs: trans(z) are stored along the way.
   */
   
-  // the first layer is sort of artificial, it is just defined for notational
-  // convenience to contain the orignial x observation
-  gsl_vector_memcpy((*q).transf_x[0],(*q).x);
-  gsl_vector_memcpy((*q).z[0],(*q).x);
+  // for input layer we use convention: x = z = transf(z)
+  gsl_vector_memcpy(q->transf_x[0],q->x);
+  gsl_vector_memcpy(q->z[0],q->x);
   
-  for (int i = 0; i <(*p).num_layers-1; i++){
-    // compute Wx
-    gsl_blas_dgemv(CblasNoTrans, 1, (*p).weights[i], (*q).transf_x[i], 0, (*q).transf_x[i+1]);
-    // update to z=Wx+b and store
-    gsl_vector_add((*q).transf_x[i+1], (*p).biases[i]);
-    gsl_vector_memcpy((*q).z[i+1],(*q).transf_x[i+1]);
-    // update to sigmoid(z) or softmax(z)
-    if (i == (*p).num_layers-2){
-      (*p).trans_final((*q).transf_x[i+1]);
-      (*q).total_cost += (*p).cost((*q).transf_x[i+1], (*q).y);
-      // Rprintf("%g\n", (*q).total_cost);
+  for (int i = 0; i < p->num_layers-1; i++){
+    // compute and store z
+    compute_score(q,p,i);
+
+    if (i == p->num_layers-2){
+      // final layer transformation
+      p->trans_final(q->transf_x[i+1]);
+      q->total_cost += p->cost(q->transf_x[i+1], q->y);
     }
-    else
-      (*p).trans((*q).transf_x[i+1]);
+    else {
+      // hidden layer transformation
+      p->trans(q->transf_x[i+1]);
+    }
   }
 }
+
+void compute_score(par_c* q, par* p, int i){
+  /*
+    computes score z= Wx + b
+   */
+  
+  // compute Wx
+  gsl_blas_dgemv(CblasNoTrans, 1, p->weights[i], q->transf_x[i], 0, q->transf_x[i+1]);
+  // compute z = Wx + b
+  gsl_vector_add(q->transf_x[i+1], p->biases[i]);
+  gsl_vector_memcpy(q->z[i+1],q->transf_x[i+1]);
+}
+
+
+
 
 #endif // _FORWARD_

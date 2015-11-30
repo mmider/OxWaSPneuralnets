@@ -59,37 +59,14 @@ void destroy_weight_obj(gsl_matrix* weights[], int n)
     gsl_matrix_free(weights[i]);
 }
 
-void init_parameters_core(par_c* q, par* p)
-{
-  int n = (*p).num_layers;
-  int* ls = (*p).layer_sizes;
-  gsl_vector* gradient_biases[n-1];
-  gsl_matrix* gradient_weights[n-1];
-  gsl_vector* z[n];
-  gsl_vector* transf_x[n];
-  gsl_vector* delta[n];
-  
-  init_bias_object(gradient_biases, ls+1,n-1);
-  init_weight_object(gradient_weights, ls,n);
-  init_bias_object(z, ls, n);
-  init_bias_object(transf_x, ls, n);
-  init_bias_object(delta, ls+1, n - 1);
-
-  (*q).gradient_biases = gradient_biases;
-  (*q).gradient_weights = gradient_weights;
-  (*q).z = z;
-  (*q).transf_x = transf_x;
-  (*q).delta = delta;
-}
-
 void destroy_parameters_core(par_c* q, par* p)
 {
-  int n = (*p).num_layers;
-  destroy_bias_obj((*q).gradient_biases,n - 1);
-  destroy_weight_obj((*q).gradient_weights,n - 1);
-  destroy_bias_obj((*q).z,n);
-  destroy_bias_obj((*q).transf_x, n);
-  destroy_bias_obj((*q).delta, n-1);
+  int n = p->num_layers;
+  destroy_bias_obj(q->gradient_biases,n - 1);
+  destroy_weight_obj(q->gradient_weights,n - 1);
+  destroy_bias_obj(q->z,n);
+  destroy_bias_obj(q->transf_x, n);
+  destroy_bias_obj(q->delta, n-1);
 }
 
 

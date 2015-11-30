@@ -64,10 +64,23 @@ void softmax_prime(gsl_vector* probs, int y, gsl_vector* ans){
 }
 
 double softmax_cost(gsl_vector* probs, int y){
-  // Calculate loss (note: y must be coded from 0, ..., n_classes)
-  double loss = -log(gsl_vector_get(probs, y));
+  double loss = 0.0;
+  int n = (*probs).size;
+  for (int i = 0; i < n; i++){
+    loss -= (y==i) * log(gsl_vector_get(probs, i)) + (1-(y==i)) * log(1-gsl_vector_get(probs, i));
+  }
   return(loss);
 }
+
+double squared_error_cost(gsl_vector* probs, int y, gsl_vector* ans){
+  double loss = 0.0;
+  int n = (*probs).size;
+  for (int i = 0; i < n; i++){
+    loss += 0.5 * pow(gsl_vector_get(probs,i)-y,2);
+  }
+  return(loss);
+}
+
 
 void squared_error_prime(gsl_vector* prediction, int y, gsl_vector* ans)
 {

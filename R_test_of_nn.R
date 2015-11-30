@@ -26,7 +26,7 @@ plot(X, col=y+1, pch=16)
 
 layer_sizes = c(ncol(X),20,3)
 num_layers = 3
-num_iterations = 1000
+num_iterations = 2000
 batch_size = nrow(X) /10
 step_size = 0.1
 penalty = 0.001
@@ -43,7 +43,8 @@ out = .C("nn",
          nrow = as.integer(nrow(X)),
          ncol = as.integer(ncol(X)),
          penalty = as.double(penalty),
-         output = as.double(-1), output2 = as.double(rep(0,num_iterations)))
+         output = as.double(-1), output2 = as.double(rep(0,num_iterations)),
+         trans_type = as.integer(2))
 
 out$output
 plot(out$output2, type ="l")
@@ -74,7 +75,8 @@ out = .C("nn",
          ncol = as.integer(ncol(X)),
          penalty = as.double(penalty),
          output = as.double(-1),
-         output2 = as.double(rep(0,num_iterations)))
+         output2 = as.double(rep(0,num_iterations)),
+         trans_type = as.integer(1))
 
 out$output
 plot(out$output2,type = "l")

@@ -1,0 +1,2 @@
+exportPattern("^[[:alpha:]]+")
+useDynLib(OxWaSPneuralnets, .registration = TRUE)

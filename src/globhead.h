@@ -110,7 +110,7 @@ void update_last_delta(par_c* q, par* p);
 
 void update_gradients(par_c* q, par*p);
 
-void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p);
+void BatchUpdate(gsl_vector* train_data[], gsl_vector* ys, par* p);
 
 void regularisation(par* p, gsl_vector** biases, gsl_matrix** weights);
 
@@ -118,19 +118,24 @@ void momentum_update(par* p, gsl_vector** biases, gsl_matrix** weights, double s
 
 void squared_error_prime(gsl_vector* prediction, int y, gsl_vector* ans);
 
-double squared_error_cost(gsl_vector* probs, int y, gsl_vector* ans);
+double squared_error_cost(gsl_vector* probs, int y);
+
+double cost_regul_term(par* p);
 
 void vec_to_mat(gsl_vector* vec, gsl_matrix** ans);
 
 double correct_guesses(gsl_vector* test_data[],
 		       gsl_vector* ys, gsl_vector* biases[],
 		       gsl_matrix* weights[], int nrow, int num_layers,
-					      int * layer_sizes);
+		       int * layer_sizes,  int transformation_type);
 
 void data_to_gsl_vectors(double* input_array, int nrow, int ncol, gsl_vector* out[]);
 
-void nn(double* train_data, double* ys, int* layer_sizes, int* num_layers, int* num_iterations,
-	int* core_num, double* step_size, int* nrow, int* ncol, double* penalty, double* output, double* output2, int* trans_type);
+void nn(double* train_data, double* ys, double* test_data, double* ys_test,
+	int* layer_sizes, int* num_layers, int* num_iterations,
+	int* core_num, double* step_size, int* nrow, int* ncol,
+	int* nrow_test, double* penalty, double* output,
+	double* output2, double* output3, int* trans_type);
 
 gsl_vector* array_to_gsl_vector(double* input_array, int n);
 

@@ -98,7 +98,7 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
   // perform Batch updates num_iterations many times
   for (int i = 0; i < num_iterations; i++){
     p.total_cost = 0.0;
-    StochGradDesc(train_data, ys, &p);
+    BatchUpdate(train_data, ys, &p);
     // update the loss function history
     cost_hist[i] = p.total_cost;
   }
@@ -108,11 +108,12 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
     gsl_vector_memcpy(output_biases[i], p.biases[i]);
     gsl_matrix_memcpy(output_weights[i], p.weights[i]);
   }
+
   destroy_parameters(&p);
 } 
 
 
-void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
+void BatchUpdate(gsl_vector* train_data[], gsl_vector* ys, par* p){
   /*
     performs one full sweep of Stochastic Gradient Descent (actually batch updates now):
     shuffles the data, splits into batches, (TO DO: sends each batch to separate core)
@@ -152,7 +153,7 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
     gsl_matrix* gradient_weights[t-1];
     gsl_vector* z[t];
     gsl_vector* transf_x[t];
-    gsl_vector* delta[t];
+    gsl_vector* delta[t-1];
   
     init_bias_object(gradient_biases, ls+1,t-1);
     init_weight_object(gradient_weights, ls,t);

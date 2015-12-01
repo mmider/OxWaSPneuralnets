@@ -69,7 +69,7 @@ double softmax_cost(gsl_vector* probs, int y){
   return(loss);
 }
 
-double squared_error_cost(gsl_vector* probs, int y, gsl_vector* ans){
+double squared_error_cost(gsl_vector* probs, int y){
   double loss = 0.0;
   int n = (*probs).size;
   for (int i = 0; i < n; i++){
@@ -123,7 +123,7 @@ void vec_to_mat(gsl_vector* vec, gsl_matrix** ans)
 double correct_guesses(gsl_vector* test_data[],
 		       gsl_vector* ys, gsl_vector* biases[],
 		       gsl_matrix* weights[], int nrow, int num_layers,
-		       int * layer_sizes)
+		       int * layer_sizes,  int transformation_type)
 {
   par p;
   par_c q;
@@ -131,12 +131,20 @@ double correct_guesses(gsl_vector* test_data[],
   p.biases = biases;
   p.num_layers = num_layers;
   p.layer_sizes = layer_sizes;
+  p.transformation_type = transformation_type;
   p.trans = sigmoid;
   p.trans_prime = sigmoid_prime;
-  p.trans_final = softmax;
   p.trans_final_prime = sigmoid_prime;
-  p.cost = softmax_cost;
-  p.cost_prime = softmax_prime;
+  if (transformation_type == 1){
+    p.trans_final = softmax;
+    p.cost = softmax_cost;
+    p.cost_prime = softmax_prime;
+  }
+  else{
+    p.trans_final = sigmoid;
+    p.cost = squared_error_cost;
+    p.cost_prime = softmax_prime;    
+  }
   p.total_cost = 0;
   q.total_cost = 0;
   gsl_vector* z[num_layers];
@@ -164,6 +172,19 @@ double correct_guesses(gsl_vector* test_data[],
     gsl_vector_free(transf_x[i]);
   }
   return total / nrow;
+}
+
+double cost_regul_term(par* p)
+{
+  double total = 0.0;
+  for (int i = 0; i < p->num_layers-1; i++){
+    int size1 = (*(p->weights[i])).size1;
+    int size2 = (*(p->weights[i])).size2;
+    for (int j = 0; j < size1; j++)
+      for (int k = 0; k < size2; k++)
+	total += pow(gsl_matrix_get(p->weights[i],j,k),2);
+  }
+  return p->penalty * total;
 }
 
 

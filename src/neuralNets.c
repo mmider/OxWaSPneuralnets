@@ -107,6 +107,7 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
     gsl_vector_memcpy(output_biases[i], p.biases[i]);
     gsl_matrix_memcpy(output_weights[i], p.weights[i]);
   }
+  destroy_parameters(&p);
 } 
 
 
@@ -217,7 +218,7 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
 
 void regularisation(par* p, gsl_vector** biases, gsl_matrix** weights)
 {
-  for (int i =0; i < p->num_layers-1; i++){
+  for (int i = 0; i < p->num_layers-1; i++){
     gsl_blas_daxpy(p->penalty, p->biases[i], biases[i]);
 
     gsl_matrix* temp = gsl_matrix_alloc((*weights[i]).size1,(*weights[i]).size2);

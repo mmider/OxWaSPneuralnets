@@ -59,6 +59,15 @@ void destroy_weight_obj(gsl_matrix* weights[], int n)
     gsl_matrix_free(weights[i]);
 }
 
+void destroy_parameters(par* p)
+{
+  int n = p->num_layers;
+  destroy_bias_obj(p->biases, n-1);
+  destroy_weight_obj(p->weights,n-1);
+  destroy_bias_obj(p->biases_momentum, n-1);
+  destroy_weight_obj(p->weights_momentum,n-1);
+}
+
 void destroy_parameters_core(par_c* q, par* p)
 {
   int n = p->num_layers;

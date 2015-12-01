@@ -82,7 +82,7 @@ double squared_error_cost(gsl_vector* probs, int y, gsl_vector* ans){
 void squared_error_prime(gsl_vector* prediction, int y, gsl_vector* ans)
 {
   // calulates the derivative of a cost function and RETURNs vector with it
-  
+
   gsl_vector_memcpy(ans,prediction);
   double temp = gsl_vector_get(ans, y);
   gsl_vector_set(ans, y, temp - 1);
@@ -144,11 +144,11 @@ double correct_guesses(gsl_vector* test_data[],
 
   init_bias_object(z, layer_sizes, num_layers);
   init_bias_object(transf_x, layer_sizes, num_layers);
-  
+
   q.z = z;
   q.transf_x = transf_x;
 
-  
+
   double total = 0.0;
   for (int i = 0; i < nrow; i++){
     q.x = test_data[i];
@@ -157,6 +157,11 @@ double correct_guesses(gsl_vector* test_data[],
 
     int y_fitted = gsl_vector_max_index(q.transf_x[num_layers-1]);
     total += (q.y==y_fitted);
+  }
+
+  for (int i = 0; i < num_layers - 1; i++){
+    gsl_vector_free(z[i]);
+    gsl_vector_free(transf_x[i]);
   }
   return total / nrow;
 }

@@ -90,6 +90,7 @@ void destroy_bias_obj(gsl_vector* biases[], int n);
 
 void destroy_weight_obj(gsl_matrix* weights[], int n);
 
+void destroy_parameters(par* p);
 
 void destroy_parameters_core(par_c* q, par* p);
 

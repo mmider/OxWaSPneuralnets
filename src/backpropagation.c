@@ -16,7 +16,6 @@ void backpropagation (par_c* q, par* p)
   update_last_delta(q,p);
   
   // For previous layers
-  gsl_vector* cp;
   gsl_vector* sp;
   for (int l = p->num_layers - 2; l > 0; l--){
     p->trans_prime(q->z[l], &sp);
@@ -61,7 +60,6 @@ void update_gradients(par_c* q, par*p)
 
   for (int l = 0; l < p->num_layers - 1; l++){
     gsl_vector_add(q->gradient_biases[l],q->delta[l]);
-    delta_temp = gsl_matrix_alloc(1,p->layer_sizes[l+1]);
     vec_to_mat(q->delta[l], &delta_temp);
     vec_to_mat(q->transf_x[l], &a_temp);
     gsl_blas_dgemm(CblasTrans,CblasNoTrans,1,delta_temp, a_temp,1,q->gradient_weights[l]);

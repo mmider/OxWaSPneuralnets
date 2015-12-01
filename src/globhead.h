@@ -15,9 +15,13 @@ typedef struct parameters
 {
   gsl_matrix** weights;
   gsl_vector** biases;
+  gsl_matrix** weights_momentum;
+  gsl_vector** biases_momentum;
+  
   double step_size;
   double penalty;
   double total_cost;
+  double contract_momentum;
   
   int* layer_sizes;
   int num_layers;
@@ -105,6 +109,10 @@ void update_last_delta(par_c* q, par* p);
 void update_gradients(par_c* q, par*p);
 
 void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p);
+
+void regularisation(par* p, gsl_vector** biases, gsl_matrix** weights);
+
+void momentum_update(par* p, gsl_vector** biases, gsl_matrix** weights, double step);
 
 void squared_error_prime(gsl_vector* prediction, int y, gsl_vector* ans);
 

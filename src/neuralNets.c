@@ -47,9 +47,15 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
   gsl_vector* biases[num_layers-1];
   gsl_matrix* weights[num_layers-1];
 
+  gsl_vector* biases_momentum[num_layers-1];
+  gsl_matrix* weights_momentum[num_layers-1];
+
    // no biases in the first layer, so start from (layer_sizes + 1)
   init_bias_object(biases, (layer_sizes+1),num_layers-1);
   init_weight_object(weights, layer_sizes,num_layers);
+
+  init_bias_object(biases_momentum, (layer_sizes+1),num_layers-1);
+  init_weight_object(weights_momentum, layer_sizes,num_layers);
 
   // set initial values
   randomize_bias(biases, (layer_sizes+1), num_layers-1, r);
@@ -61,6 +67,10 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
   // set parameters that will be passed around:
   p.biases = biases;
   p.weights = weights;
+  p.biases_momentum = biases_momentum;
+  p.weights_momentum = weights_momentum;
+  p.contract_momentum = 0.9;
+  
   p.layer_sizes = layer_sizes;
   p.num_layers = num_layers;
   p.batch_size = batch_size;
@@ -119,7 +129,13 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
 
   // number of batches / cores
   int batch_number = m / p->batch_size;
-  
+  /*
+  gsl_vector* bias_updates[p->num_layers-1];
+  gsl_matrix* weight_updates[p->num_layers-1];
+
+  init_bias_object(bias_updates,(p->layer_sizes+1), p->num_layers-1);
+  init_weight_object(weight_updates,layer_sizes, p->num_layers);
+  */
   for (int i = 0; i < batch_number; i++){
     // SGD update for a batch, this will be done by each core separately:
     // ----------------------------
@@ -157,12 +173,19 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
       forward(&q,p);
       backpropagation(&q,p);
     }
-    p->total_cost += q.total_cost/p->batch_size;
+    p->total_cost += q.total_cost/m;
 
     // TO DO
     // at this point the cores should communicate to update weights and biases
     // so the update shuould really happen outside the loop
     // update weights and biases:
+    
+    double learning_rate = -p->step_size/p->batch_size;
+    regularisation(p, q.gradient_biases, q.gradient_weights);
+    momentum_update(p, q.gradient_biases,q.gradient_weights, learning_rate);
+    
+
+    /*
     for (int j = 0; j < p->num_layers-1; j++){
       q.learning_rate = -p->step_size/ p->batch_size;
       gsl_blas_daxpy(q.learning_rate, q.gradient_biases[j], p->biases[j]);
@@ -171,7 +194,53 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
       gsl_matrix_scale(p->weights[j],1-p->penalty * q.learning_rate);
       gsl_matrix_add(p->weights[j], q.gradient_weights[j]);
     }
+    */
+    /*
+    for (int j = 0; j < p->num_layers-1; j++){
+      gsl_vector_add(bias_updates[j],gradient_biases[j]);
+      gsl_matrix_add(weight_updates[j], gradient_weights[j]);
+    }
+    */
     destroy_parameters_core(&q,p);
+  }
+  /*
+  for (int j = 0; j < p->num_layers-1; j++){
+    double learning_rate = -p->step_size;
+    gsl_blas_daxpy(learning_rate, bias_updates[j], p->biases[j]);
+    gsl_matrix_scale(weight_updates[j], learning_rate);
+    // apply penalty
+    gsl_matrix_scale(p->weights[j],1-p->penalty * learning_rate);
+    gsl_matrix_add(p->weights[j], weights_updates[j]);
+  }
+  */
+}
+
+void regularisation(par* p, gsl_vector** biases, gsl_matrix** weights)
+{
+  for (int i =0; i < p->num_layers-1; i++){
+    gsl_blas_daxpy(p->penalty, p->biases[i], biases[i]);
+
+    gsl_matrix* temp = gsl_matrix_alloc((*weights[i]).size1,(*weights[i]).size2);
+    gsl_matrix_memcpy(temp, p->weights[i]);
+    gsl_matrix_scale(temp, -p->penalty);
+    gsl_matrix_add(weights[i],temp);
+    gsl_matrix_free(temp);
+  }
+
+}
+
+void momentum_update(par* p, gsl_vector** biases, gsl_matrix** weights, double step)
+{
+  double mu = p->contract_momentum;
+  for (int i = 0; i < p->num_layers-1; i++){
+    gsl_vector_scale(p->biases_momentum[i], mu);
+    gsl_blas_daxpy(step, biases[i], p->biases_momentum[i]);
+    gsl_vector_add(p->biases[i], p->biases_momentum[i]);
+
+    gsl_matrix_scale(p->weights_momentum[i], mu);
+    gsl_matrix_scale(weights[i],step);
+    gsl_matrix_add(p->weights_momentum[i],weights[i]);
+    gsl_matrix_add(p->weights[i], p->weights_momentum[i]);
   }
 }
 

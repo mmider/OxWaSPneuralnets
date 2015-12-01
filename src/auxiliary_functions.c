@@ -6,19 +6,19 @@
 void print_bias(gsl_vector* bias)
 {
   int n = (*bias).size;
-  printf("\nprinting bias vector:\n");
+  Rprintf("\nprinting bias vector:\n");
   for (int i =0; i < n; i++)
-    printf("b(%d)=%g\n",i,gsl_vector_get(bias,i));
+    Rprintf("b(%d)=%g\n",i,gsl_vector_get(bias,i));
 }
 
 void print_weight(gsl_matrix* weight)
 {
   int n = (*weight).size1;
   int k = (*weight).size2;
-  printf("\nprinting weight vector:\n");
+  Rprintf("\nprinting weight vector:\n");
   for (int i = 0; i < n; i++)
     for (int j =0; j < k; j++)
-      printf("m(%d,%d) = %g\n",i,j,gsl_matrix_get(weight,i,j));
+      Rprintf("m(%d,%d) = %g\n",i,j,gsl_matrix_get(weight,i,j));
 }
 
 void sigmoid(gsl_vector* x){
@@ -64,11 +64,8 @@ void softmax_prime(gsl_vector* probs, int y, gsl_vector* ans){
 }
 
 double softmax_cost(gsl_vector* probs, int y){
-  double loss = 0.0;
-  int n = (*probs).size;
-  for (int i = 0; i < n; i++){
-    loss -= (y==i) * log(gsl_vector_get(probs, i)) + (1-(y==i)) * log(1-gsl_vector_get(probs, i));
-  }
+  double loss;
+  loss = -log(gsl_vector_get(probs, y));
   return(loss);
 }
 

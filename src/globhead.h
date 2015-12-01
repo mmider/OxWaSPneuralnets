@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <R.h>
 #include <time.h>
+#include "timing.h"
 
 typedef struct parameters
 {
@@ -17,12 +18,12 @@ typedef struct parameters
   gsl_vector** biases;
   gsl_matrix** weights_momentum;
   gsl_vector** biases_momentum;
-  
+
   double step_size;
   double penalty;
   double total_cost;
   double contract_momentum;
-  
+
   int* layer_sizes;
   int num_layers;
   int batch_number; // number of cores
@@ -30,7 +31,7 @@ typedef struct parameters
   int nrow;
   int ncol;
   int transformation_type;
-  
+
   gsl_rng* r;
 
   void (*trans)(gsl_vector* x);
@@ -56,7 +57,7 @@ typedef struct parameters_core
   double learning_rate;
   gsl_vector* x;
   int y;
-  
+
 } par_c;
 
 void print_bias(gsl_vector* bias);

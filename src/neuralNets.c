@@ -4,7 +4,7 @@
 #include "globhead.h"
 
 void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
-		gsl_vector* ys, int num_iterations, int batch_size,
+		gsl_vector* ys, int num_iterations, int core_num,
 		double step_size, gsl_matrix* output_weights[], gsl_vector* output_biases[],
 		int nrow, int ncol, double penalty, double cost_hist[], int transformation_type)
 {
@@ -73,7 +73,8 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
   
   p.layer_sizes = layer_sizes;
   p.num_layers = num_layers;
-  p.batch_size = batch_size;
+  p.batch_number = core_num;
+  p.batch_size = nrow / core_num;
   p.step_size = step_size;
   p.r = r;
   p.trans = sigmoid;
@@ -127,9 +128,6 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
     indices[i] = i;
   }
   gsl_ran_shuffle(p->r,indices, m, sizeof(int));
-
-  // number of batches / cores
-  int batch_number = m / p->batch_size;
   
   gsl_vector* bias_updates[p->num_layers-1];
   gsl_matrix* weight_updates[p->num_layers-1];
@@ -190,7 +188,7 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
     destroy_parameters_core(&q,p);
     //}                                                                                // uncomment for the serial
   }
-  double learning_rate = -p->step_size/p->batch_size;
+  double learning_rate = -p->step_size;
   regularisation(p, bias_updates, weight_updates);
   momentum_update(p, bias_updates, weight_updates, learning_rate);
   for (int i = 0; i < p->num_layers-1; i++){

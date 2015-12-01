@@ -25,6 +25,7 @@ typedef struct parameters
   
   int* layer_sizes;
   int num_layers;
+  int batch_number; // number of cores
   int batch_size;
   int nrow;
   int ncol;
@@ -95,7 +96,7 @@ void destroy_parameters(par* p);
 void destroy_parameters_core(par_c* q, par* p);
 
 void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
-		gsl_vector* ys,int num_iterations, int batch_size,
+		gsl_vector* ys,int num_iterations, int core_num,
 		double step_size,gsl_matrix* output_weights[], gsl_vector* output_biases[],
 		int nrow, int ncol, double penalty, double cost_hist[], int transformation_type);
 
@@ -129,7 +130,7 @@ double correct_guesses(gsl_vector* test_data[],
 void data_to_gsl_vectors(double* input_array, int nrow, int ncol, gsl_vector* out[]);
 
 void nn(double* train_data, double* ys, int* layer_sizes, int* num_layers, int* num_iterations,
-	int* batch_size, double* step_size, int* nrow, int* ncol, double* penalty, double* output, double* output2, int* trans_type);
+	int* core_num, double* step_size, int* nrow, int* ncol, double* penalty, double* output, double* output2, int* trans_type);
 
 gsl_vector* array_to_gsl_vector(double* input_array, int n);
 

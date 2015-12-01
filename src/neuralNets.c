@@ -94,7 +94,7 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
     p.cost_prime = softmax_prime;
   }
 
-  // perform Batch updates num_iterations many times  
+  // perform Batch updates num_iterations many times
   for (int i = 0; i < num_iterations; i++){
     p.total_cost = 0.0;
     StochGradDesc(train_data, ys, &p);
@@ -130,18 +130,21 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
 
   // number of batches / cores
   int batch_number = m / p->batch_size;
-  /*
+  
   gsl_vector* bias_updates[p->num_layers-1];
   gsl_matrix* weight_updates[p->num_layers-1];
 
   init_bias_object(bias_updates,(p->layer_sizes+1), p->num_layers-1);
-  init_weight_object(weight_updates,layer_sizes, p->num_layers);
-  */
-  for (int i = 0; i < batch_number; i++){
+  init_weight_object(weight_updates,p->layer_sizes, p->num_layers);
+  
+  #pragma omp parallel
+  {
+    //for (int i = 0; i < batch_number; i++){                                  // uncomment for the serial
     // SGD update for a batch, this will be done by each core separately:
     // ----------------------------
     
     // initialise parameters that will be shared in each core
+    int i = omp_get_thread_num();
     par_c q;
     q.total_cost = 0;
     // init_parameters_core(&q, p);
@@ -174,46 +177,26 @@ void StochGradDesc(gsl_vector* train_data[], gsl_vector* ys, par* p){
       forward(&q,p);
       backpropagation(&q,p);
     }
+
+    #pragma omp critical
+    {
     p->total_cost += q.total_cost/m;
-
-    // TO DO
-    // at this point the cores should communicate to update weights and biases
-    // so the update shuould really happen outside the loop
-    // update weights and biases:
-    
-    double learning_rate = -p->step_size/p->batch_size;
-    regularisation(p, q.gradient_biases, q.gradient_weights);
-    momentum_update(p, q.gradient_biases,q.gradient_weights, learning_rate);
-    
-
-    /*
     for (int j = 0; j < p->num_layers-1; j++){
-      q.learning_rate = -p->step_size/ p->batch_size;
-      gsl_blas_daxpy(q.learning_rate, q.gradient_biases[j], p->biases[j]);
-      gsl_matrix_scale(q.gradient_weights[j], q.learning_rate);
-      // apply penalty
-      gsl_matrix_scale(p->weights[j],1-p->penalty * q.learning_rate);
-      gsl_matrix_add(p->weights[j], q.gradient_weights[j]);
+      gsl_vector_add(bias_updates[j],q.gradient_biases[j]);
+      gsl_matrix_add(weight_updates[j], q.gradient_weights[j]);
     }
-    */
-    /*
-    for (int j = 0; j < p->num_layers-1; j++){
-      gsl_vector_add(bias_updates[j],gradient_biases[j]);
-      gsl_matrix_add(weight_updates[j], gradient_weights[j]);
+    //printf("\nFirst element: %g, thread number: %d\n\n", gsl_matrix_get(bias_updates[0], 0,0), omp_get_thread_num());
     }
-    */
     destroy_parameters_core(&q,p);
+    //}                                                                                // uncomment for the serial
   }
-  /*
-  for (int j = 0; j < p->num_layers-1; j++){
-    double learning_rate = -p->step_size;
-    gsl_blas_daxpy(learning_rate, bias_updates[j], p->biases[j]);
-    gsl_matrix_scale(weight_updates[j], learning_rate);
-    // apply penalty
-    gsl_matrix_scale(p->weights[j],1-p->penalty * learning_rate);
-    gsl_matrix_add(p->weights[j], weights_updates[j]);
+  double learning_rate = -p->step_size/p->batch_size;
+  regularisation(p, bias_updates, weight_updates);
+  momentum_update(p, bias_updates, weight_updates, learning_rate);
+  for (int i = 0; i < p->num_layers-1; i++){
+    gsl_vector_free(bias_updates[i]);
+    gsl_matrix_free(weight_updates[i]);
   }
-  */
 }
 
 void regularisation(par* p, gsl_vector** biases, gsl_matrix** weights)

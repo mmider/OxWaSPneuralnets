@@ -12,6 +12,7 @@
 #include <time.h>
 #include <omp.h>
 #include "timing.h"
+//#include <mpi.h>
 
 typedef struct parameters
 {

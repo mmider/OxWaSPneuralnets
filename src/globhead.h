@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <R.h>
 #include <time.h>
+#include <omp.h>
 #include "timing.h"
 
 typedef struct parameters
@@ -141,5 +142,22 @@ void nn(double* train_data, double* ys, double* test_data, double* ys_test,
 	int* output6, int* output7, int* trans_type);
 
 gsl_vector* array_to_gsl_vector(double* input_array, int n);
+
+int* randomperm11(int n);
+
+int* rand_fold(const int N_obs, const int fold);
+
+void SplitFoldfunc(const gsl_matrix *TrainData, int fold, int* rand_seq, gsl_matrix** SubTrain);
+
+void combinefold (gsl_matrix** foldX, gsl_matrix** foldY, int N_obs, int fold, int SizeGroup, int Features,
+                  int label_size, gsl_matrix** CvTrainX, gsl_matrix** CvTrainY);
+
+void CrossVal(const gsl_matrix* XTrainData, const gsl_matrix* YTrainData, const gsl_matrix* XTestData,
+              const gsl_matrix* YTestData, const int FOLD, const double* Lambda, const int sizelambda, const int* layer_sizes,  const int num_layers,
+              const int num_iterations, const int core_size, const double step_size, const int trans_type, double* probs_test, int* predicted_test);
+
+void CvNN(double* train_data, double* ys, int* layer_sizes, int* num_layers, int* num_iterations,
+            int* core_num, double* step_size, int* nrow, int* ncol, double* penalty, int* penalty_size,
+            int* trans_type, double* test_data_x, double* test_data_y, int* nrow_test, int* fold, double* probs_test, int* predicted_test);
 
 #endif // _GLOBHEAD_H_

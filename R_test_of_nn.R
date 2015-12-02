@@ -66,8 +66,8 @@ y_test = test$y[1:500]
 
 layer_sizes = c(ncol(X),20,10)
 num_layers = 3
-num_iterations = 600
-core_num = 8
+num_iterations = 1000
+core_num = 3
 #batch_size = nrow(X)/8
 step_size = 0.0001
 penalty = 0.001
@@ -89,12 +89,16 @@ out = .C("nn",
          output = as.double(-1),
          output2 = as.double(rep(0,num_iterations)),
          output3 = as.double(-1),
+         output4 = as.double(rep(0,nrow(X)*10)),
+         output5 = as.double(rep(0,nrow(X_test)*10)),
+         output6 = as.integer(rep(0, nrow(X))),
+         output7 = as.integer(rep(0,nrow(X_test))),
          trans_type = as.integer(1))
 
 out$output
 plot(out$output2,type = "l")
 out$output3
-
+out$output6
 
 
 

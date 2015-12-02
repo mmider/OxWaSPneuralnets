@@ -11,23 +11,25 @@
 #'@param lambda The regularisation parameter
 #'@param core_num The number of parallel cores
 #'
-#'@return List containing elements \code{train_acc}, \code{test_acc}, \code{loss_over_time}
+#'@return List containing the following elements: \code{train_acc}, \code{test_acc}, \code{loss_over_time},
+#'\code{prob_train}, \code{prob_test}, \code{pred_train}, \code{pred_test}
 #'
 #'@examples
-#'\dontrun{
+#'
 #' data(toy_data)
 #' plot(train$X, col=train$y+1, pch=16)
 #' res = fit_neural_network(train$X, train$y, test$X, test$y, n_iterations = 1000, step_size = 0.001)
 #' plot(res)
 #' res
 #'
-#'
+#'\dontrun{
 #' data(mnist)
 #' # Pick only first 1000 data points (for speed)
-#' res = fit_neural_network(train$x[1:1000, ], train$y, test$x[1:500, ], test$y, n_iterations = 1000, step_size = 0.0001)
+#' res = fit_neural_network(train$x[1:1000, ], train$y[1:1000], test$x[1:500, ], test$y[1:500], n_iterations = 1000, step_size = 0.0001)
 #' plot(res)
 #' res
 #' }
+#'@useDynLib OxWaSPneuralnets, .registration=TRUE
 #'@export
 #'
 fit_neural_network = function(train_X, train_y, test_X, test_y,
@@ -69,8 +71,8 @@ fit_neural_network = function(train_X, train_y, test_X, test_y,
   out = list("train_acc" = obj$train_acc,
              "test_acc" = obj$test_acc,
              "loss_over_time" = obj$loss_over_time,
-             "prob_train" = as.matrix(obj$prob_train, ncol=n_classes),
-             "prob_test" = as.matrix(obj$prob_test, ncol=n_classes),
+             "prob_train" = matrix(obj$prob_train, ncol=n_classes),
+             "prob_test" = matrix(obj$prob_test, ncol=n_classes),
              "pred_train" = obj$pred_train,
              "pred_test" = obj$pred_test)
   class(out) = "OxWaSPNN"

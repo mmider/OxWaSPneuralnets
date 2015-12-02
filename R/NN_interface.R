@@ -9,7 +9,7 @@
 #'@param n_iterations The number of iterations for fitting the neural network
 #'@param step_size The step size for updating parameters at each iteration
 #'@param lambda The regularisation parameter
-#'@param core_num The number of parallel cores
+#'@param n_cores The number of parallel cores used
 #'
 #'@return List containing the following elements: \code{train_acc}, \code{test_acc}, \code{loss_over_time},
 #'\code{prob_train}, \code{prob_test}, \code{pred_train}, \code{pred_test}
@@ -17,10 +17,12 @@
 #'@examples
 #'
 #' data(toy_data)
-#' plot(train$X, col=train$y+1, pch=16)
-#' res = fit_neural_network(train$X, train$y, test$X, test$y, n_iterations = 1000, step_size = 0.001)
+#' plot(toy_train$X, col=toy_train$y+1, pch=16)
+#' res = fit_neural_network(toy_train$X, toy_train$y, toy_test$X, toy_test$y, n_iterations = 1000, step_size = 0.001)
 #' plot(res)
 #' res
+#' # Confusion matrix for test data
+#' table(res$pred_test, toy_test$y)
 #'
 #'\dontrun{
 #' data(mnist)
@@ -38,7 +40,7 @@ fit_neural_network = function(train_X, train_y, test_X, test_y,
                               n_iterations = 100,
                               step_size = 0.01,
                               lambda = 0.001,
-                              core_num = 8){
+                              n_cores = 8){
 
   if(n_hidden_layers != length(hidden_layer_sizes)) stop("Misspecified hidden layer sizes!")
   if(nrow(train_X) != length(train_y)) stop("Dimensions of training data do not match")

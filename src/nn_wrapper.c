@@ -26,6 +26,11 @@ void nn(double* train_data, double* ys, double* test_data, double* ys_test, int*
    *output = evaluate_results(data_vectors, y, output_biases,
 			      output_weights, *nrow, ncat, *num_layers,
 			      layer_sizes, *trans_type, probs, predicted_train);
+   //destroy 
+   for (int i = 0; i < *nrow; i++)
+     gsl_vector_free(data_vectors[i]);
+   gsl_vector_free(y);
+
    if (test_data){
       gsl_vector* data_test_vectors[*nrow_test];
       data_to_gsl_vectors(test_data, *nrow_test, *ncol, data_test_vectors);
@@ -33,10 +38,15 @@ void nn(double* train_data, double* ys, double* test_data, double* ys_test, int*
       *output3 = evaluate_results(data_test_vectors, y_test, output_biases,
 				  output_weights, *nrow_test, ncat, *num_layers,
 				  layer_sizes, *trans_type, probs_test, predicted_test);
+      for (int i = 0; i < *nrow_test; i++)
+	gsl_vector_free(data_test_vectors[i]);
+      gsl_vector_free(y_test);
    }
   
 
-   // destroy biases and weights
+   // destroy biases and weights and temporary arrays storing data:
+   destroy_bias_obj(output_biases, *num_layers-1);
+   destroy_weight_obj(output_weights, *num_layers-1);
 }
 
 #endif // _NN_WRAPPER_

@@ -20,7 +20,7 @@ void forward(par_c* q, par* p) {
     if (i == p->num_layers-2){
       // final layer transformation
       p->trans_final(q->transf_x[i+1]);
-      q->total_cost += p->cost(q->transf_x[i+1], q->y) + cost_regul_term(p);
+      q->total_cost += p->cost(q->transf_x[i+1], q->y);
     }
     else {
       // hidden layer transformation

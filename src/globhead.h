@@ -125,10 +125,11 @@ double cost_regul_term(par* p);
 
 void vec_to_mat(gsl_vector* vec, gsl_matrix** ans);
 
-double correct_guesses(gsl_vector* test_data[],
+double evaluate_results(gsl_vector* test_data[],
 		       gsl_vector* ys, gsl_vector* biases[],
-		       gsl_matrix* weights[], int nrow, int num_layers,
-		       int * layer_sizes,  int transformation_type);
+			gsl_matrix* weights[], int nrow, int ncat, int num_layers,
+			int * layer_sizes,  int transformation_type, double probs[],
+			int predicted[]);
 
 void data_to_gsl_vectors(double* input_array, int nrow, int ncol, gsl_vector* out[]);
 
@@ -136,7 +137,8 @@ void nn(double* train_data, double* ys, double* test_data, double* ys_test,
 	int* layer_sizes, int* num_layers, int* num_iterations,
 	int* core_num, double* step_size, int* nrow, int* ncol,
 	int* nrow_test, double* penalty, double* output,
-	double* output2, double* output3, int* trans_type);
+	double* output2, double* output3,double* output4, double* output5,
+	int* output6, int* output7, int* trans_type);
 
 gsl_vector* array_to_gsl_vector(double* input_array, int n);
 

@@ -120,10 +120,11 @@ void vec_to_mat(gsl_vector* vec, gsl_matrix** ans)
 }
 
 
-double correct_guesses(gsl_vector* test_data[],
+double evaluate_results(gsl_vector* test_data[],
 		       gsl_vector* ys, gsl_vector* biases[],
-		       gsl_matrix* weights[], int nrow, int num_layers,
-		       int * layer_sizes,  int transformation_type)
+			gsl_matrix* weights[], int nrow, int ncat, int num_layers,
+			int * layer_sizes,  int transformation_type, double probs[],
+			int predicted[])
 {
   par p;
   par_c q;
@@ -162,7 +163,11 @@ double correct_guesses(gsl_vector* test_data[],
     q.x = test_data[i];
     q.y = (int) gsl_vector_get(ys,i);
     forward(&q, &p);
-
+    predicted[i] = gsl_vector_max_index(q.transf_x[num_layers-1]);
+    for (int j = 0; j < ncat; j++){
+      probs[i * ncat + j] = gsl_vector_get(q.transf_x[num_layers-1],j);
+    }
+    
     int y_fitted = gsl_vector_max_index(q.transf_x[num_layers-1]);
     total += (q.y==y_fitted);
   }

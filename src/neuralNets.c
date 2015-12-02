@@ -100,7 +100,7 @@ void NeuralNets(int* layer_sizes, int num_layers, gsl_vector* train_data[],
     p.total_cost = 0.0;
     BatchUpdate(train_data, ys, &p);
     // update the loss function history
-    cost_hist[i] = p.total_cost;
+    cost_hist[i] = p.total_cost + cost_regul_term(&p);
   }
 
   // copy the results to the output matrices and vectors
@@ -135,7 +135,9 @@ void BatchUpdate(gsl_vector* train_data[], gsl_vector* ys, par* p){
 
   init_bias_object(bias_updates,(p->layer_sizes+1), p->num_layers-1);
   init_weight_object(weight_updates,p->layer_sizes, p->num_layers);
-  
+
+  omp_set_dynamic(0);
+  omp_set_num_threads(p->batch_number);
   #pragma omp parallel
   {
     //for (int i = 0; i < batch_number; i++){                                  // uncomment for the serial
@@ -144,6 +146,7 @@ void BatchUpdate(gsl_vector* train_data[], gsl_vector* ys, par* p){
     
     // initialise parameters that will be shared in each core
     int i = omp_get_thread_num();
+    
     par_c q;
     q.total_cost = 0;
     // init_parameters_core(&q, p);

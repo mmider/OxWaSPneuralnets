@@ -25,8 +25,8 @@ Essentially, the algorithm for training a neural network the following:
         * feedforward pass
         * backpropagation
         * update parameters
-    * end do
-* end do
+    * end for
+* end for
 
 ## Feedforward pass
 For simplicity, we will focus on one hidden layer only for a K-class classification problem.
@@ -36,4 +36,14 @@ Each node on an $l^{th}$ hidden layer takes the input $x^{(l-1)}$ and transforms
 We compute the error terms for all the nodes in the neural net. We proceeed recursively over layers starting from the last one and moving backwards, i.e. for $l=L,(L-1),\dots,1$ (L being output layer), for each node $i$ in a given layer $l$ we compute: $\delta_i^{(l)}$ - the error term for a given node. These allow us to compute the gradients of the loss function (we call it R) with respect to the weights and the biases: $\frac{\partial R}{\partial w_{ij}^{(l)}}$ and $\frac{\partial R}{\partial b_{i}^{(l)}}$.
 
 ## Parameters' update
-By moving weights and biases along the direction of the gradients computed in the backpropagation step above we are aiming to minimise the  (regularised) loss (taken to be a cross entropy in the classification scenario). We use the momentum update as well as regularisation. First update momentum for layer $l$: $v^{(l)} = \mu v^{(l)} - \alpha(\Delta w^{(l)}+\lambda w^{(l)})$ and then update the weights $w^{(l)} = w^{(l)} +v^{(l)}$. Then repeat for the biases. Perform these for the output and all the hidden layers.
+By moving weights and biases along the direction of the gradients computed in the backpropagation step above we are aiming to minimise the  (regularised) loss (taken to be a cross entropy in the classification scenario). We use the momentum update as well as regularisation. First update momentum for layer $l$: $v^{(l)} = \mu v^{(l)} - \alpha(\Delta w^{(l)}+\lambda w^{(l)})$  where $\lambda$ is the regularization parameter, $\mu$ is the contraction of the momentum and $\alpha$ is the learning step. Then update the weights $w^{(l)} = w^{(l)} +v^{(l)}$. Then repeat for the biases. Perform these for the output and all the hidden layers.
+
+## R function
+In this R package there are two functions. 
+fit_neural_network is used  for different purposes. First of all it takes in input both train and test data sets and it sets the neural net parameters: number of layers and number of neurons for each layer. Moreover the user can specify the parameters adopted in the training of the neural net: the step size of the batch gradient descent step, the regularization parameter $\lambda$. 
+
+This function call a C function that implements the pseudocode written above. In order to speed up the computation, the training set can be splitted into subsets, and inside each epoch (see pseudocode) each CPU can run the inner for-loop for a specific subset of the training data set. The number of cores can be chosen by the user.
+
+The C function recalls some ISPC functions to exploit the vectorization in the feedforward pass (in particular for the computation of the scores) and in the weights and biases update in the gradient descent step^[Future developments will apply vectorization also in the backpropagation step].
+
+CV_neural_network improves the neural network's performance implementing a cross validation for the regularization parameter $\lambda$.

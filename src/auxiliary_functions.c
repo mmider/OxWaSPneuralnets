@@ -144,7 +144,7 @@ double evaluate_results(gsl_vector* test_data[],
   else{
     p.trans_final = sigmoid;
     p.cost = squared_error_cost;
-    p.cost_prime = softmax_prime;    
+    p.cost_prime = softmax_prime;
   }
   p.total_cost = 0;
   q.total_cost = 0;
@@ -157,7 +157,6 @@ double evaluate_results(gsl_vector* test_data[],
   q.z = z;
   q.transf_x = transf_x;
 
-
   double total = 0.0;
   for (int i = 0; i < nrow; i++){
     q.x = test_data[i];
@@ -167,7 +166,7 @@ double evaluate_results(gsl_vector* test_data[],
     for (int j = 0; j < ncat; j++){
       probs[i * ncat + j] = gsl_vector_get(q.transf_x[num_layers-1],j);
     }
-    
+
     int y_fitted = gsl_vector_max_index(q.transf_x[num_layers-1]);
     total += (q.y==y_fitted);
   }

@@ -9,7 +9,7 @@
 #'@param n_iterations The number of iterations for fitting the neural network
 #'@param step_size The step size for updating parameters at each iteration
 #'@param lambda The regularisation parameter
-#'@param n_cores The number of parallel cores used
+#'@param n_cores The number of parallel cores
 #'
 #'@return List containing the following elements: \code{train_acc}, \code{test_acc}, \code{loss_over_time},
 #'\code{prob_train}, \code{prob_test}, \code{pred_train}, \code{pred_test}
@@ -17,12 +17,10 @@
 #'@examples
 #'
 #' data(toy_data)
-#' plot(toy_train$X, col=toy_train$y+1, pch=16)
-#' res = fit_neural_network(toy_train$X, toy_train$y, toy_test$X, toy_test$y, n_iterations = 1000, step_size = 0.001)
+#' plot(train$X, col=train$y+1, pch=16)
+#' res = fit_neural_network(train$X, train$y, test$X, test$y, n_iterations = 1000, step_size = 0.001)
 #' plot(res)
 #' res
-#' # Confusion matrix for test data
-#' table(res$pred_test, toy_test$y)
 #'
 #'\dontrun{
 #' data(mnist)
@@ -56,7 +54,7 @@ fit_neural_network = function(train_X, train_y, test_X, test_y,
            layer_sizes = as.integer(layer_sizes),
            n_layers = as.integer(n_layers),
            num_iterations = as.integer(n_iterations),
-           core_num = as.integer(core_num),
+           n_cores = as.integer(n_cores),
            step_size = as.double(step_size),
            nrow = as.integer(nrow(train_X)),
            ncol = as.integer(ncol(train_X)),

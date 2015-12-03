@@ -9,6 +9,7 @@ void nn(double* train_data, double* ys, double* test_data, double* ys_test, int*
 	double* output2, double* output3, double* probs, double* probs_test,
 	int* predicted_train, int* predicted_test, int* trans_type)
 {
+
    gsl_vector* data_vectors[*nrow];
    data_to_gsl_vectors(train_data, *nrow, *ncol, data_vectors);
 
@@ -26,7 +27,7 @@ void nn(double* train_data, double* ys, double* test_data, double* ys_test, int*
    *output = evaluate_results(data_vectors, y, output_biases,
 			      output_weights, *nrow, ncat, *num_layers,
 			      layer_sizes, *trans_type, probs, predicted_train);
-   //destroy 
+   //destroy
    for (int i = 0; i < *nrow; i++)
      gsl_vector_free(data_vectors[i]);
    gsl_vector_free(y);
@@ -42,7 +43,7 @@ void nn(double* train_data, double* ys, double* test_data, double* ys_test, int*
 	gsl_vector_free(data_test_vectors[i]);
       gsl_vector_free(y_test);
    }
-  
+
 
    // destroy biases and weights and temporary arrays storing data:
    destroy_bias_obj(output_biases, *num_layers-1);

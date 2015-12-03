@@ -12,7 +12,8 @@
 #include <time.h>
 #include <omp.h>
 #include "timing.h"
-//#include <mpi.h>
+#include "ispcfunctions.h"
+
 
 typedef struct parameters
 {
@@ -107,13 +108,15 @@ void forward(par_c* q, par* p);
 
 void compute_score(par_c* q, par* p, int i);
 
+void compute_score_ispc(par_c* q, par* p, int ind);
+
 void backpropagation (par_c* q, par* p);
 
 void update_last_delta(par_c* q, par* p);
 
 void update_gradients(par_c* q, par*p);
 
-void BatchUpdate(gsl_vector* train_data[], gsl_vector* ys, par* p);
+void BatchUpdate(gsl_vector* train_data[], gsl_vector* ys, par* p, double* t0, double* t1, double* t2);
 
 void regularisation(par* p, gsl_vector** biases, gsl_matrix** weights);
 
@@ -160,5 +163,12 @@ void CrossVal(const gsl_matrix* XTrainData, const gsl_matrix* YTrainData, const 
 void CvNN(double* train_data, double* ys, int* layer_sizes, int* num_layers, int* num_iterations,
             int* core_num, double* step_size, int* nrow, int* ncol, double* penalty, int* penalty_size,
             int* trans_type, double* test_data_x, double* test_data_y, int* nrow_test, int* fold, double* probs_test, int* predicted_test);
+
+
+void ispc_update_bias_helper(par* p, gsl_vector** dbiases, int i, int nrow, double mu, double lambda, double step);
+
+void ispc_update_W_helper(par* p, gsl_matrix** dW, int i, int nrow, int ncol, double mu, double lambda, double step);
+
+void ispc_update(par* p, gsl_vector** dbiases, gsl_matrix** dweights, double step);
 
 #endif // _GLOBHEAD_H_

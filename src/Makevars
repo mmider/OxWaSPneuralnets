@@ -4,4 +4,4 @@ PKG_LIBS = -L ~/usr/local/lib -lgsl -lgslcblas -lm
 all: $(SHLIB)
 
 ispcfunctions.o: ispcfunctions.c
-	~/ispc-v1.8.2-linux/ispc -O3 --arch=x86-64 --target=avx --math-lib=system ispcfunctions.c -o ispcfunctions.o -h ispcfunctions.h
+	ispc -O3 --arch=x86-64 --target=avx --math-lib=system ispcfunctions.c -o ispcfunctions.o -h ispcfunctions.h

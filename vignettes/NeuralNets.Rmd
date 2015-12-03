@@ -8,51 +8,32 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+## Introduction
+Our R package contains an implementation of a Neural Network for a classification problem with any arbitrary layers and hidden features. To improve performace the major bulk of the code has been written in C, and can potentially be run in parallel on CPUs.
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+## Neural Net Structure
+Diagram below^[image taken from http://cs231n.github.io/neural-networks-1/ website] represents a structure of a neural net
+![alt text](../figures/neural_net2.jpeg)
+Input layer denotes the data $x^{(0)}$ - number of nodes in an input layer equals the dimensionality of the data. Each hidden layer comprises of units/nodes and each of these has its own bias term and weight vector. The units from each layer take the ouputs of the previous layer, compute the score by applying the linear transformation according to its weights and bias and output a non-linear transformation of the score. The output of the nodes from the final layer is interpreted as the class probability for the classification problem. In the picture above $x$ would be three dimensional. In the final picture the final layer has only one node, which is a setup for either regression or binary classification problem. 
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+## Pseudocode
+Essentially, the algorithm for training a neural network the following:
 
-## Vignette Info
+* initialise weights and biases according to N(0,0.1)
+* for ( i in 1 : num_epochs ) do:
+    * for ((x,y) in train_data) do:
+        * feedforward pass
+        * backpropagation
+        * update parameters
+    * end do
+* end do
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+## Feedforward pass
+For simplicity, we will focus on one hidden layer only for a K-class classification problem.
+Each node on an $l^{th}$ hidden layer takes the input $x^{(l-1)}$ and transforms it according to $x_i^{(l)}=\sigma(x^{(l-1)T} w_i^{(l)}+b_i^{(l)})$, where $w_i^{(l)}$ and $b_i^{(l)}$ are respectively the weight vector and the bias term of the $i^{th}$ unit in the $l^{th}$ hidden layer. Also $\sigma(z)=\frac{1}{1+exp(-z)}$. The output layer does almost the same, but uses softmax instead of sigmoid. The outputs are $P(y = k|x)$ for $k=1\dots K$ - class labels.
 
-## Styles
+## Backpropagation
+We compute the error terms for all the nodes in the neural net. We proceeed recursively over layers starting from the last one and moving backwards, i.e. for $l=L,(L-1),\dots,1$ (L being output layer), for each node $i$ in a given layer $l$ we compute: $\delta_i^{(l)}$ - the error term for a given node. These allow us to compute the gradients of the loss function (we call it R) with respect to the weights and the biases: $\frac{\partial R}{\partial w_{ij}^{(l)}}$ and $\frac{\partial R}{\partial b_{i}^{(l)}}$.
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+## Parameters' update
+By moving weights and biases along the direction of the gradients computed in the backpropagation step above we are aiming to minimise the  (regularised) loss (taken to be a cross entropy in the classification scenario). We use the momentum update as well as regularisation. First update momentum for layer $l$: $v^{(l)} = \mu v^{(l)} - \alpha(\Delta w^{(l)}+\lambda w^{(l)})$ and then update the weights $w^{(l)} = w^{(l)} +v^{(l)}$. Then repeat for the biases. Perform these for the output and all the hidden layers.

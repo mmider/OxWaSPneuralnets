@@ -2,7 +2,7 @@
 % Please edit documentation in R/CV_interface.R
 \name{CV_neural_network}
 \alias{CV_neural_network}
-\title{Fit neural network, with parameter tuning via cross-validation}
+\title{Fit neural network, with parameter tuning via cross-validation on training set}
 \usage{
 CV_neural_network(train_X, train_y, test_X, test_y, n_hidden_layers = 1,
   hidden_layer_sizes = c(20), n_iterations = 100, step_size = 0.01,
@@ -30,11 +30,11 @@ CV_neural_network(train_X, train_y, test_X, test_y, n_hidden_layers = 1,
 \item{n_cores}{The number of parallel cores}
 }
 \value{
-List containing the following elements: \code{train_acc}, \code{test_acc}, \code{loss_over_time},
-\code{prob_train}, \code{prob_test}, \code{pred_train}, \code{pred_test}
+List containing the following elements:
+\code{prob_test}, \code{pred_test}
 }
 \description{
-Fit neural network, with parameter tuning via cross-validation
+Fit neural network, with parameter tuning via cross-validation on training set
 }
 \examples{
 
@@ -47,7 +47,7 @@ table(res$pred_test, toy_test$y)
 
 \dontrun{
 data(mnist)
-# Pick only first 1000 data points (for speed)
+# Pick only first 500 data points (for speed)
 res = CV_neural_network(train$x[1:500, ], train$y[1:500], test$x[1:250, ], test$y[1:250], n_iterations = 100, step_size = 0.0001)
 table(res$pred_test, test$y[1:250])
 }

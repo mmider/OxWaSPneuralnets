@@ -17,10 +17,12 @@
 #'@examples
 #'
 #' data(toy_data)
-#' plot(train$X, col=train$y+1, pch=16)
-#' res = fit_neural_network(train$X, train$y, test$X, test$y, n_iterations = 1000, step_size = 0.001)
+#' plot(toy_train$X, col=toy_train$y+1, pch=16)
+#' res = fit_neural_network(toy_train$X, toy_train$y, toy_test$X, toy_test$y, n_iterations = 1000, step_size = 0.001)
 #' plot(res)
 #' res
+#' # Confusion matrix for test data
+#' table(res$pred_test, toy_test$y)
 #'
 #'\dontrun{
 #' data(mnist)
@@ -28,6 +30,8 @@
 #' res = fit_neural_network(train$x[1:1000, ], train$y[1:1000], test$x[1:500, ], test$y[1:500], n_iterations = 1000, step_size = 0.0001)
 #' plot(res)
 #' res
+#' res = CV_neural_network(train$x[1:500, ], train$y[1:500], test$x[1:250, ], test$y[1:250], n_iterations = 100, step_size = 0.0001)
+#' table(res$pred_test, test$y[1:250])
 #' }
 #'@useDynLib OxWaSPneuralnets, .registration=TRUE
 #'@export
@@ -84,7 +88,7 @@ fit_neural_network = function(train_X, train_y, test_X, test_y,
 #' @export
 #'
 print.OxWaSPNN = function(obj){
-  s = sprintf("Train accuracy: %1.3f\nTest accuracy: %1.3f", obj$train_acc, obj$test_acc)
+  s = sprintf("Train accuracy: \t%1.3f\nTest accuracy: \t%1.3f", obj$train_acc, obj$test_acc)
   cat(s)
 }
 

@@ -1,4 +1,4 @@
-#' Fit neural network, with parameter tuning via cross-validation
+#' Fit neural network, with parameter tuning via cross-validation on training set
 #'
 #'@param train_X Matrix of training data (data points in rows, features in columns)
 #'@param train_y Vector of labels for training data (these have to be integers from 0 to n_classes - 1)
@@ -11,8 +11,8 @@
 #'@param lambdas Vector of regularisation parameters (cross-validation is carried out over these)
 #'@param n_cores The number of parallel cores
 #'
-#'@return List containing the following elements: \code{train_acc}, \code{test_acc}, \code{loss_over_time},
-#'\code{prob_train}, \code{prob_test}, \code{pred_train}, \code{pred_test}
+#'@return List containing the following elements:
+#'\code{prob_test}, \code{pred_test}
 #'
 #'@examples
 #'
@@ -25,7 +25,7 @@
 #'
 #'\dontrun{
 #' data(mnist)
-#' # Pick only first 1000 data points (for speed)
+#' # Pick only first 500 data points (for speed)
 #' res = CV_neural_network(train$x[1:500, ], train$y[1:500], test$x[1:250, ], test$y[1:250], n_iterations = 100, step_size = 0.0001)
 #' table(res$pred_test, test$y[1:250])
 #' }

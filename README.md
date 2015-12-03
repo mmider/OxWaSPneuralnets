@@ -15,7 +15,7 @@ Load the package
 library(OxWaSPneuralnets)
 ```
 
-and see the help files `R ?fit_neural_network` or `R ?CV_neural_network`. The following minimal example fits a neural network with one hidden layer
+and see the help files `?fit_neural_network` or `?CV_neural_network`. The following minimal example fits a neural network with one hidden layer
 
 ```R 
 data(mnist)

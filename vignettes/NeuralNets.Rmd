@@ -1,6 +1,6 @@
 ---
 title: "Parallelising Neural Nets - micro-project for OxWaSP module 4"
-author: "Giuseppe Di Benedetto, Leon Law, Kaspar Martens, Marcin Mider"
+author: "Giuseppe Di Benedetto, Leon Law, Kaspar Märtens, Marcin Mider"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -39,11 +39,15 @@ We compute the error terms for all the nodes in the neural net. We proceeed recu
 By moving weights and biases along the direction of the gradients computed in the backpropagation step above we are aiming to minimise the  (regularised) loss (taken to be a cross entropy in the classification scenario). We use the momentum update as well as regularisation. First update momentum for layer $l$: $v^{(l)} = \mu v^{(l)} - \alpha(\Delta w^{(l)}+\lambda w^{(l)})$  where $\lambda$ is the regularization parameter, $\mu$ is the contraction of the momentum and $\alpha$ is the learning step. Then update the weights $w^{(l)} = w^{(l)} +v^{(l)}$. Then repeat for the biases. Perform these for the output and all the hidden layers.
 
 ## Implementation
-In this R package there are two functions. 
-`fit_neural_network` is used  for different purposes. First of all, it takes in input both train and test data sets and it sets the neural net parameters: number of layers and number of neurons for each layer. Moreover the user can specify the parameters adopted in the training of the neural net: the step size of the batch gradient descent step, and the regularization parameter $\lambda$. 
+In this R package there are two functions:
+
+1. `fit_neural_network`
+2. `CV_neural_network`
+
+The first one is used for different purposes. It takes in both train and test data sets and the user can specify the neural net parameters: number of hidden layers and number of neurons for each layer. Moreover the user can specify the parameters adopted in the training of the neural net: the step size of the batch gradient descent step, and the regularization parameter $\lambda$. 
 
 This function call a C function that implements the pseudocode written above. In order to speed up the computation, the training set can be splitted into subsets, and inside each epoch (see pseudocode) each CPU can run the inner for-loop for a specific subset of the training data set. The number of cores can be chosen by the user.
 
 The C function recalls some ISPC functions to exploit the vectorization in the feedforward pass (in particular for the computation of the scores) and in the weights and biases update in the gradient descent step^[Future developments will apply vectorization also in the backpropagation step].
 
-CV_neural_network improves the neural network's performance implementing a cross validation for the regularization parameter $\lambda$.
+The function `CV_neural_network` makes it possible to tune the regularization parameter $\lambda$ by carrying out cross-validation on the training data, and finally fitting the neural network with the best configuration to the whole training portion to obtain predictions on test data. 

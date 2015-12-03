@@ -15,12 +15,11 @@ void CrossVal(const gsl_matrix* XTrainData, const gsl_matrix* YTrainData, const 
   int GroupSize = N_obs/FOLD;
   int Nlambda = sizelambda;
   int N_obs_test = XTestData->size1;
-  Rprintf("________");
   int* seq_fold;
   seq_fold = rand_fold(N_obs,FOLD);
-  for (int i = 0; i < N_obs; i++){
+  /*for (int i = 0; i < N_obs; i++){
     printf("%d\n",seq_fold[i]);
-  }
+  }*/
 
   gsl_matrix* Xfolds[FOLD];
   for (int d = 0; d < FOLD; d++)
@@ -198,8 +197,8 @@ void CrossVal(const gsl_matrix* XTrainData, const gsl_matrix* YTrainData, const 
       //double success_test_check = correct_guesses(vec_cv_testX, vec_cv_testY, output_biases, output_weights, N_obs_test, num_layers, layer_sizes_2);
       //printf("Check = %G\n", success_test_check);
       //  gsl_vector* vec_cv_valX[GroupSize];
-      printf("\n-------------------------------\n Lambda = %G \n i = %d, j = %d \n", Lambda[i] ,i , j);
-      printf("Result = %G \n Thread = %d\n--------------------------------\n",results[i][j],omp_get_thread_num());
+      //printf("\n-------------------------------\n Lambda = %G \n i = %d, j = %d \n", Lambda[i] ,i , j);
+      //printf("Result = %G \n Thread = %d\n--------------------------------\n",results[i][j],omp_get_thread_num());
       gsl_vector_free(vec_cv_valY);
       for (int u = 0; u < (GroupSize); u++){
         gsl_vector_free(vec_cv_valX[u]);

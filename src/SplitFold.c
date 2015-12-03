@@ -56,7 +56,7 @@ void SplitFoldfunc(const gsl_matrix *TrainData, int fold, int* rand_seq, gsl_mat
           }
            h = h + 1;
         }
-     printf("----------\n");
+     //printf("----------\n");
      }
   SubTrain[t] = K;
   }

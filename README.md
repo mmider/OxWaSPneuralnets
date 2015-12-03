@@ -1,7 +1,7 @@
 # OxWaSPneuralnets
 
 This R package for fitting neural networks was written as a project for OxWaSP module 4 by Giuseppe Di Benedetto, Leon Law, Kaspar Märtens, and Marcin Mider.
-The vignette for the package can be found [here](https://github.com/mmider/OxWaSPneuralnets/blob/master/vignettes/NeuralNets.Rmd).
+The vignette for the package can be seen [here](https://htmlpreview.github.io/?https://raw.githubusercontent.com/mmider/OxWaSPneuralnets/master/vignettes/NeuralNets.html).
 
 To use our package, install it as follows
 

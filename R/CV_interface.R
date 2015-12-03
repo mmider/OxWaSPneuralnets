@@ -65,10 +65,10 @@ CV_neural_network = function(train_X, train_y, test_X, test_y,
            Ytest = as.double(test_y),
            nrow_test = as.integer(nrow(test_X)),
            n_folds = as.integer(n_folds),
-           pred_train = as.double(rep(0, nrow(train_X)*n_classes)),
+           prob_test = as.double(rep(0, nrow(test_X)*n_classes)),
            pred_test = as.integer(rep(0, nrow(test_X)))
   )
-  out = list("pred_train" = obj$pred_train,
+  out = list("prob_test" = matrix(obj$prob_test, ncol=n_classes),
              "pred_test" = obj$pred_test)
 
   return(out)
